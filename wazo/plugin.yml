@@ -7,3 +7,5 @@ tags:
   - incrediblepbx
   - application
 homepage: https://github.com/sboily/incrediblepbx-pbxstatus
+debian_depends:
+  - dialog
