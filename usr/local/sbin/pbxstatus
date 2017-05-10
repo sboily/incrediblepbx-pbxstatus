@@ -8,7 +8,7 @@ if hostname -I > /etc/hostip; then
   else
     _PHONE=" "
   fi
-    _PUBLIC="Public Info: `curl -s -S --user-agent "Mozilla/4.0" http://myip.pbxinaflash.com | awk 'NR==2'`"
+    _PUBLIC="Public Info: `curl -s -S --user-agent "Mozilla/4.0" http://myip.incrediblepbx.com | awk 'NR==2'`"
 else
    _IP=""
    _PUBLIC=""
@@ -142,7 +142,7 @@ TOP="\n\ZbAsterisk\ZB: $asterisk      \Zb NGINX\ZB: $nginx \Zb  Consul\ZB: $cons
 TOP="\n\ZbAsterisk\ZB: $asterisk      \Zb NGINX\ZB: $nginx \Zb  Consul\ZB: $consul\n\Zb Postfix\ZB: $postfix    \ZbIPtables\ZB: $IPtables	\Zb     SSH\ZB: $ssh\n\ZbLAN port\ZB: $eth0    \ZbFail2Ban\ZB: $fail2ban   \Zb Munin\ZB: $munin\n\Zb  AGetty\ZB: $agetty  \ZbPostgreSQL\ZB: $postgres   \ZbNR VPN\ZB: $nrclient\n\n\Zr\Z4\Zb"
 
 MID="RAM\ZB:$RAM  $OSrelease  \ZbDisk\ZB:$DISK\ZR\Z0\n\n\Z5\Zb"
-BOT="Asterisk $astversion            XiVO PBX $xivoversion\ZB\Z0\n\n\Zb$_IP\n\n$_PUBLIC\ZB\n\n\ZbSystem Time: $NOW\Zb"
+BOT="Asterisk $astversion            Wazo PBX $xivoversion\ZB\Z0\n\n\Zb$_IP\n\n$_PUBLIC\ZB\n\n\ZbSystem Time: $NOW\Zb"
 
 MSGLEN=`echo ${#MID}`
 
