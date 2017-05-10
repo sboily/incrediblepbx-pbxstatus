@@ -1,0 +1,158 @@
+#!/bin/bash
+DN="\Z1\ZrDN\Z0\ZR";
+UP="\Zr\Z2UP\Z0\ZR";
+if hostname -I > /etc/hostip; then
+    _IP=" Private IP: `cat /etc/hostip`"
+  if [ -f "/etc/pbx/.phone" ]; then
+    _PHONE=`cat /etc/pbx/.phone`
+  else
+    _PHONE=" "
+  fi
+    _PUBLIC="Public Info: `curl -s -S --user-agent "Mozilla/4.0" http://myip.pbxinaflash.com | awk 'NR==2'`"
+else
+   _IP=""
+   _PUBLIC=""
+fi
+version=`cat /etc/pbx/.version`
+xivoversion=`cat /usr/share/xivo/XIVO-VERSION`
+astversion=`asterisk -rx "core show version" | grep -m 2 ^ | tail -1 | cut -f 2 -d " "`
+#fpbxversion=`cat /var/www/html/admin/modules/core/module.xml | grep version | head -n 1 | cut -f 2 -d ">" | cut -f 1 -d "<"`
+test=`ps aux | grep -c /usr/sbin/asterisk`
+OSrelease="Debian 8 (jessie)"
+if [ "$test" -lt "2" ]; then
+ asterisk="$DN"
+else
+ asterisk="$UP"
+fi
+test=`ps aux | grep -c /usr/sbin/nginx`
+if [ "$test" -lt "2" ]; then
+ nginx="$DN"
+else
+ nginx="$UP"
+fi
+test=`ps aux | grep -c postgres`
+if [ "$test" -lt "2" ]; then
+ postgres="$DN"
+else
+ postgres="$UP"
+fi
+test=`ps aux | grep -c munin`
+if [ "$test" -lt "2" ]; then
+ munin="$DN"
+else
+ munin="$UP"
+fi
+test=`ps aux | grep -c consul`
+if [ "$test" -lt "2" ]; then
+ consul="$DN"
+else
+ consul="$UP"
+fi
+test=`ps aux | grep -c /usr/sbin/sshd`
+if [ "$test" -lt "2" ]; then
+ ssh="$DN"
+else
+ ssh="$UP"
+fi
+test=`ps aux | grep -c postfix`
+if [ "$test" -lt "2" ]; then
+ postfix="$DN"
+else
+ postfix="$UP"
+fi
+test=`ps aux | grep -c fail2ban`
+if [ "$test" -lt "2" ]; then
+ fail2ban="$DN"
+else
+ fail2ban="$UP"
+fi
+test=`ps aux | grep -c ntpd`
+if [ "$test" -lt "2" ]; then
+ ntpd="$DN"
+else
+ ntpd="$UP"
+fi
+test=`sudo iptables -nL | grep -c DROP`
+if [ "$test" -lt "1" ]; then
+ IPtables="$DN"
+else
+ IPtables="$UP"
+fi
+#IPPORT=`ifconfig|gawk '/flags/{print $1}'|cut -f 1 -d ":"|tail -1`
+test=`ifconfig | grep venet0`
+if [[ !  -z  $test  ]]; then
+IPPORT='venet0'
+eth0="$UP"
+else
+ IPPORT='eth0'
+ test=`/sbin/ifconfig $IPPORT | grep -c inet`
+ if [ "$test" -lt "2" ]; then
+  eth0="$DN"
+ else
+  eth0="$UP"
+ fi
+fi
+RAM=`free -h | tr -s " " |grep -m 2 ^ | tail -1 | cut -f 4 -d " "`B
+DISK=`df -h | tr -s ' ' |grep " /" | head -n 1 | cut -f 4 -d " "`B
+#DISK=`df -h | grep -m 2 ^ | tail -1 | cut -f 15 -d " "`
+#DISK=`df -h | grep -m 4 ^ | tail -1 | tr -s ' ' | cut -f 4 -d " "`
+#if [ -z "$DISK" ]; then
+# DISK=" `df -h | grep -m 2 ^ | tail -1 | cut -f 9 -d " "`"
+#fi
+if [ "${#DISK}" -eq "4" ]; then
+ DISK=" $DISK"
+fi
+
+test=`cat /etc/pbx/.version`
+if [[ "$test" < "13-12.3" ]]; then
+ gvoauth="$DN"
+else
+ gvoauth="$UP"
+fi
+test=`ps aux | grep -c agetty`
+if [ "$test" -lt "2" ]; then
+ agetty="$DN"
+else
+ agetty="$UP"
+fi
+test=`ps aux | grep -c hfaxd`
+if [ "$test" -lt "2" ]; then
+ hfax="$DN"
+else
+ hfax="$UP"
+fi
+
+test=`ps aux | grep -c nrservice`
+if [ "$test" -lt "2" ]; then
+ nrclient="$DN"
+else
+ nrclient="$UP"
+fi
+
+test=`ps aux | grep -c knockd`
+if [ "$test" -lt "2" ]; then
+ knockd="$DN"
+else
+ knockd="$UP"
+fi
+
+NOW=`date`
+
+TOP="\n\ZbAsterisk\ZB: $asterisk      \Zb NGINX\ZB: $nginx \Zb  Consul\ZB: $consul\n\Zb Postfix\ZB: $postfix    \ZbIPtables\ZB: $IPtables      \ZbSSH\ZB: $ssh\n\ZbLAN $IPPORT\ZB: $eth0    \ZbFail2Ban\ZB: $fail2ban   \Zb Munin\ZB: $munin\n\n\Zr\Z4\Zb"
+TOP="\n\ZbAsterisk\ZB: $asterisk      \Zb NGINX\ZB: $nginx \Zb  Consul\ZB: $consul\n\Zb Postfix\ZB: $postfix    \ZbIPtables\ZB: $IPtables	\Zb     SSH\ZB: $ssh\n\ZbLAN port\ZB: $eth0    \ZbFail2Ban\ZB: $fail2ban   \Zb Munin\ZB: $munin\n\Zb  AGetty\ZB: $agetty  \ZbPostgreSQL\ZB: $postgres   \ZbNR VPN\ZB: $nrclient\n\n\Zr\Z4\Zb"
+
+MID="RAM\ZB:$RAM  $OSrelease  \ZbDisk\ZB:$DISK\ZR\Z0\n\n\Z5\Zb"
+BOT="Asterisk $astversion            XiVO PBX $xivoversion\ZB\Z0\n\n\Zb$_IP\n\n$_PUBLIC\ZB\n\n\ZbSystem Time: $NOW\Zb"
+
+MSGLEN=`echo ${#MID}`
+
+if [ "$MSGLEN" -gt "67" ]; then
+ MID2=`echo $MID| sed -e 's/  / /g'`
+ MID=`echo $MID2| sed -e 's/Disk/ Disk/g'`
+fi
+
+MSG="$TOP$MID$BOT"
+
+dialog --no-lines --colors --title "Incredible PBX $version for `hostname -s`" --msgbox "$MSG" 20 47
+
+clear

@@ -1,0 +1,9 @@
+name: pbxstatus
+namespace: incrediblepbx
+version: 0.0.1
+author: Ward Mundy
+display_name: PBX status
+tags:
+  - incrediblepbx
+  - application
+homepage: https://github.com/sboily/incrediblepbx-pbxstatus
